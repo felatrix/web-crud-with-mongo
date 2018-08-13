@@ -3,7 +3,7 @@ const app = express();
 const exphbs  = require('express-handlebars');
 const bodyParser = require('body-parser')
 const mongoose = require('mongoose');
-
+var methodOverride = require('method-override')
 
 //map global promise - get rid of warning
 mongoose.Promise = global.Promise;
@@ -27,6 +27,8 @@ app.use(bodyParser.urlencoded({ extended: false }));
 // parse application/json
 app.use(bodyParser.json());
 
+//method override middleware
+app.use(methodOverride('_method'));
 
 //index route
 app.get('/',(req,res)=>{
@@ -53,6 +55,19 @@ app.get('/ideas',(req,res)=>{
 app.get('/ideas/add',(req, res)=>{
     res.render('ideas/add');
 });
+
+//edit idea form
+app.get('/ideas/edit/:id',(req,res)=>{
+    Idea.findOne({
+        _id: req.params.id
+    }).then(idea =>{
+        res.render('ideas/edit',{
+            idea:idea
+        });
+    } );
+    
+});
+
 //form proses
 app.post('/ideas',(req, res)=>{
     let errors = [];
@@ -82,6 +97,21 @@ app.post('/ideas',(req, res)=>{
         });
     }
 });
+
+//edit form process
+app.put('/ideas/:id',(req,res)=>{
+    Idea.findOne({
+        _id:req.params.id
+    }).then(idea=>{
+        //new values
+        idea.title = req.body.title;
+        idea.details = req.body.details;
+        idea.save().then(idea=>{
+            res.redirect('/ideas');
+        })
+    })
+});
+
 const port = 3000;
 
 app.listen(port , ()=>{
