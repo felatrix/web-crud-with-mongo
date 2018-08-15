@@ -1,4 +1,8 @@
-.logo {
+#logo {
     width: 130px;
     margin:auto;
+}
+
+.card{
+    margin: auto;
 }
