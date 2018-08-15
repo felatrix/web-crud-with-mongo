@@ -7,11 +7,13 @@ const bodyParser = require('body-parser')
 const mongoose = require('mongoose');
 const methodOverride = require('method-override')
 const flash = require('connect-flash');
+const passport = require('passport');
 
 //load routes
 const ideas = require('./routes/ideas');
-const users = require('./routes/users');
-
+const users = require('./routes/users'); 
+//passport config
+require('./config/passport')(passport);
 //map global promise - get rid of warning
 mongoose.Promise = global.Promise;
 //connect to database
@@ -37,7 +39,7 @@ app.use(bodyParser.json());
 
 //method override middleware
 app.use(methodOverride('_method'));
-//express session
+//express session middleware
 app.use(session({
     secret: 'secret',
     resave: true,

@@ -58,7 +58,7 @@ router.post('/',(req, res)=>{
             details: req.body.details
         }
         new Idea(newUser).save().then(Idea =>{
-            req.flash('succes_msg','your data added');
+            req.flash('success_msg','your data added');
             res.redirect('/ideas');
         });
     }
@@ -73,7 +73,7 @@ router.put('/:id',(req,res)=>{
         idea.title = req.body.title;
         idea.details = req.body.details;
         idea.save().then(idea=>{
-            req.flash('succes_msg','your data update');
+            req.flash('success_msg','your data update');
             res.redirect('/ideas');
         });
     })
