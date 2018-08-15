@@ -14,7 +14,9 @@
 </head>
 <body>
    {{> _navbars}}
-    <div class="container">{{{body}}}</div>
+    <div class="container">
+        {{> _msg}}
+        {{{body}}}</div>
     
     <!-- Optional JavaScript -->
     <!-- jQuery first, then Popper.js, then Bootstrap JS -->

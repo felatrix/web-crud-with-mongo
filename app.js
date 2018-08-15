@@ -1,10 +1,11 @@
 const express = require('express');
+const session = require('express-session');
 const app = express();
 const exphbs  = require('express-handlebars');
 const bodyParser = require('body-parser')
 const mongoose = require('mongoose');
-var methodOverride = require('method-override')
-
+const methodOverride = require('method-override')
+const flash = require('connect-flash');
 //map global promise - get rid of warning
 mongoose.Promise = global.Promise;
 //connect to database
@@ -29,6 +30,22 @@ app.use(bodyParser.json());
 
 //method override middleware
 app.use(methodOverride('_method'));
+//express session
+app.use(session({
+    secret: 'secret',
+    resave: true,
+    saveUninitialized: true,
+  }));
+//flash connect middleware
+app.use(flash());
+
+//global variables
+app.use(function(req,res,next){
+    res.locals.success_msg = req.flash('success_msg');
+    res.locals.error_msg = req.flash('error_msg');
+    res.locals.error = req.flash('error');
+    next();
+});
 
 //index route
 app.get('/',(req,res)=>{
@@ -68,7 +85,7 @@ app.get('/ideas/edit/:id',(req,res)=>{
     
 });
 
-//form proses
+//form add proses
 app.post('/ideas',(req, res)=>{
     let errors = [];
     if(!req.body.title){
@@ -93,6 +110,7 @@ app.post('/ideas',(req, res)=>{
             details: req.body.details
         }
         new Idea(newUser).save().then(Idea =>{
+            req.flash('succes_msg','your data added');
             res.redirect('/ideas');
         });
     }
@@ -107,16 +125,20 @@ app.put('/ideas/:id',(req,res)=>{
         idea.title = req.body.title;
         idea.details = req.body.details;
         idea.save().then(idea=>{
+            req.flash('succes_msg','your data update');
             res.redirect('/ideas');
-        })
+        });
     })
 });
 //delete
 app.delete('/ideas/:id',(req,res)=>{
     Idea.remove({_id: req.params.id}).then(()=>{
+        req.flash('success_msg','your data removed');
         res.redirect('/ideas');
-    })
+    });
 });
+
+
 
 const port = 3000;
 
