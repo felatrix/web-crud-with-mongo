@@ -1,4 +1,5 @@
 const express = require('express');
+const path = require('path');
 const session = require('express-session');
 const app = express();
 const exphbs  = require('express-handlebars');
@@ -27,6 +28,9 @@ app.set('view engine', 'handlebars');
 //body parser middleware
 // parse application/x-www-form-urlencoded
 app.use(bodyParser.urlencoded({ extended: false }));
+
+//static folder
+app.use(express.static(path.join(__dirname,'public')));
 
 // parse application/json
 app.use(bodyParser.json());

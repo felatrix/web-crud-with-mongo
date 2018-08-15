@@ -5,12 +5,12 @@ const router = express.Router();
 
 //user login
 router.get('/login',(req,res)=>{
-    res.send('login');
+    res.render('users/login');
 });
 
 //users register
 router.get('/register',(req,res)=>{
-    res.send('register');
+    res.render('users/register');
 });
 
 module.exports = router;
