@@ -6,6 +6,11 @@ const bodyParser = require('body-parser')
 const mongoose = require('mongoose');
 const methodOverride = require('method-override')
 const flash = require('connect-flash');
+
+//load routes
+const ideas = require('./routes/ideas');
+const users = require('./routes/users');
+
 //map global promise - get rid of warning
 mongoose.Promise = global.Promise;
 //connect to database
@@ -13,9 +18,7 @@ mongoose.connect('mongodb://localhost/mavid',{
     useMongoClient: true
 }).then(()=>console.log('mongodb connect')).catch(err => console.log(err));
 
-//load idea model
-require('./models/idea');
-const Idea = mongoose.model ('ideas');
+
 
 //handlebars middleware
 app.engine('handlebars', exphbs({defaultLayout: 'main'}));
@@ -58,86 +61,10 @@ app.get('/about',(req, res)=>{
     res.render('about');
 });
 
-//idea index Page
-app.get('/ideas',(req,res)=>{
-    Idea.find({}).sort({date:''})
-    .then(ideas=>{
-        res.render('ideas/index',{
-            ideas:ideas
-        });
-    });
-})
 
-//add ideas form
-app.get('/ideas/add',(req, res)=>{
-    res.render('ideas/add');
-});
-
-//edit idea form
-app.get('/ideas/edit/:id',(req,res)=>{
-    Idea.findOne({
-        _id: req.params.id
-    }).then(idea =>{
-        res.render('ideas/edit',{
-            idea:idea
-        });
-    } );
-    
-});
-
-//form add proses
-app.post('/ideas',(req, res)=>{
-    let errors = [];
-    if(!req.body.title){
-        errors.push({
-            text:'Please add a title'
-        })
-    }
-    if(!req.body.details){
-        errors.push({
-            text:'please add some details'
-        })
-    }
-    if(errors.length > 0){
-        res.render('ideas/add',{
-            errors:errors,
-            title:req.body.title,
-            details:req.body.details 
-        });
-    }else {
-        const newUser = {
-            title: req.body.title,
-            details: req.body.details
-        }
-        new Idea(newUser).save().then(Idea =>{
-            req.flash('succes_msg','your data added');
-            res.redirect('/ideas');
-        });
-    }
-});
-
-//edit form process
-app.put('/ideas/:id',(req,res)=>{
-    Idea.findOne({
-        _id:req.params.id
-    }).then(idea=>{
-        //new values
-        idea.title = req.body.title;
-        idea.details = req.body.details;
-        idea.save().then(idea=>{
-            req.flash('succes_msg','your data update');
-            res.redirect('/ideas');
-        });
-    })
-});
-//delete
-app.delete('/ideas/:id',(req,res)=>{
-    Idea.remove({_id: req.params.id}).then(()=>{
-        req.flash('success_msg','your data removed');
-        res.redirect('/ideas');
-    });
-});
-
+//uses routes
+app.use('/ideas',ideas);
+app.use('/users',users);
 
 
 const port = 3000;
